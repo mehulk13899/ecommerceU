@@ -1,5 +1,5 @@
 import firebase from "firebase/app";
-import 'firebase/firestore';
+import 'firebase/firestore'
 import 'firebase/auth';
 
 var firebaseConfig = {
@@ -18,19 +18,36 @@ if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 
+export const auth = firebase.auth();
+export const firestore = firebase.firestore();
+export const createUserProfileDocument = async (userAuth, ...otherOptions) => {
 
-export const fun = () => {
-    console.log('Fun calling');
+    if (!userAuth) return;
+    const userRef = firestore.doc(`users/${userAuth.uid}`)//get document object from server  id data is not preset
+    //then server also return some data object value
+    const snapShort = await userRef.get();//tell if data is in our database or not
+    if (!snapShort.exists) {
+
+        const { displayName, email } = userAuth;
+        const createdAt = new Date();
+        userRef.set(
+            {
+                displayName,
+                email,
+                createdAt,
+                ...otherOptions
+            }
+        )
+    }
+    return userRef;
 }
 
-export const auth = firebase.auth();
+
 const googleProvider = new firebase.auth.GoogleAuthProvider()
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 export const signInWithGoogle = () => {
-    console.log('Hello form ui');
     auth.signInWithPopup(googleProvider).then((res) => {
-        console.log(res.user)
     }).catch((error) => {
         console.log(error.message)
     })

@@ -1,13 +1,10 @@
 import React from 'react'
 import { Link } from "react-router-dom";
 import "./header.component.styles.scss";
-import { firebase, auth } from "../../firebase/firebase-utils";
-
-
-
+import { auth } from "../../firebase/firebase-utils";
 import { ReactComponent as Logo } from "../../assets/crown.svg";
-function HeaderComponent({ current_user }) {
-    console.log(current_user);
+import { connect } from 'react-redux';
+function HeaderComponent({ currentUser }) {
     return (
         <div className='header'>
             <Link className='logo-container' to='/'>
@@ -18,11 +15,15 @@ function HeaderComponent({ current_user }) {
                 <Link className='option' to='/shop'>SHOP</Link>
                 <Link className='option' to='/'>CONTACTS</Link>
                 {
-                    current_user ? <Link className='option' onClick={() => auth.signOut()}>SIGN OUT </Link> : <Link className='option' to='/sign'>SIGN</Link>
+                    currentUser ? <Link className='option' onClick={() => auth.signOut()}>SIGN OUT </Link> : <Link className='option' to='/sign'>SIGN</Link>
                 }
 
             </div>
         </div>
     )
 }
-export default HeaderComponent
+
+const mapStateToProps = state => ({
+    currentUser: state.user.currentUser
+})
+export default connect(mapStateToProps)(HeaderComponent)
